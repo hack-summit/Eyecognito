@@ -3,6 +3,10 @@ package com.baymax;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.rnfs.RNFSPackage;
+import com.eko.RNBackgroundDownloaderPackage;
+import com.masteratul.downloadmanager.ReactNativeDownloadManagerPackage;
+import net.no_mad.tts.TextToSpeechPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.wenkesj.voice.VoicePackage;
@@ -26,6 +30,10 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNFSPackage(),
+            new RNBackgroundDownloaderPackage(),
+            new ReactNativeDownloadManagerPackage(),
+            new TextToSpeechPackage(),
             new RNGestureHandlerPackage(),
             new VectorIconsPackage(),
             new VoicePackage()

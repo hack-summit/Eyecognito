@@ -30,10 +30,13 @@ class AIChat extends React.Component {
         Voice.onSpeechResults = this.onSpeechResults;
         Voice.onSpeechPartialResults = this.onSpeechPartialResults;
         Voice.onSpeechVolumeChanged = this.onSpeechVolumeChanged;
+        Tts.setDefaultPitch(1);
+
     }
 
     componentWillUnmount() {
         Voice.destroy().then(Voice.removeAllListeners);
+
     }
 
     sendMessage(text) {
@@ -44,16 +47,25 @@ class AIChat extends React.Component {
                 'Content-Type': 'application/json'
             }
         };
+        let response_message = '';
         let messages = [];
         messages.push({ type: 'out', message: text});
         this.setState({messages: [...this.state.messages, ...messages], text: ''});
         axios.post(url, payload, requestOptions)
         .then((response)=> {
+            console.warn(response)
             let messages = [];
             messages.push({ type: 'in', message: response.data.results[0]});
-            Tts.speak(request.data.results[0]);
             this.setState({messages: [...this.state.messages, ...messages]});
+            Tts.getInitStatus().then(() => {
+                // Tts.speak(response.data.results[0]);
+                Tts.speak(response.data.results[0]  );
+                Tts.voices().then(voices => console.warn(voices));
+
+
+              });
         })
+      
     }
 
     onSpeechStart = e => {

@@ -4,9 +4,14 @@ import {View, AsyncStorage, Alert, ActivityIndicator, SafeAreaView, ScrollView, 
 import {Text, Header, Button, Icon, ListItem, Divider} from 'react-native-elements';
 
 import Dashboard from './dashboard';
+import Documents from './documents';
 
 import axios from 'axios';
 import { serverIP, colors } from '../config';
+
+class Hidden extends Component {
+    render() {return <View/>}
+}
 
 class MainNavigator extends Component {
     state = {
@@ -24,6 +29,7 @@ class MainNavigator extends Component {
             AsyncStorage.setItem('patient', JSON.stringify(patient));
             AsyncStorage.setItem('user', JSON.stringify(user));
             this.setState({loading: false})
+                
         })
         .catch((error)=>{ this.handleError(error); });
     }
@@ -59,43 +65,15 @@ class MainNavigator extends Component {
             return {patient, user};
         }
         getData().then(({patient, user})=>{
-            this.setState({ patient, user })
-            this.syncData();
+            if ( JSON.stringify(user) != '{}')
+                this.setState({ patient, user, loading: false })
+            else
+                this.syncData();
         });
-
     }
 
 
     render() {
-        const DrawerComponent = (props) => {
-            try {
-            return (
-                <SafeAreaView style={{flex: 1}}>
-                    
-                    <View>
-                        <Divider style={{width: 250, margin: 10}}/>
-                        <ListItem 
-                            Component={TouchableOpacity}
-                            leftIcon={<Icon name='user-circle' type='font-awesome' color='#fff' size={30} />}
-                            title={<Text h4 h4Style={{fontSize: 14, color: '#fff', paddingTop: 5}}>{this.state.user.name != null ? String(this.state.user.name).toProperCase() : ''}</Text>}
-                            containerStyle={{borderBottomWidth: 0}}
-                            onPress={() =>props.navigation.navigate('AcademicHistory')}
-                        />
-                        <ListItem
-                            Component={TouchableOpacity}
-                            leftIcon={<Icon name='exit-to-app' color={colors.secondary}/>}
-                            title={<Text h4 style={{paddingTop: 20, paddingLeft: 18}}>Logout</Text>}
-                            containerStyle={{borderBottomWidth: 0}}
-                            onPress={()=>{this.logout();}}
-                        />
-                    </View>
-                </SafeAreaView>
-            )
-            }
-            catch(err) {
-                return (<View></View>)
-            }
-        }
         
         let navigation;
         
@@ -110,6 +88,25 @@ class MainNavigator extends Component {
                     drawerIcon: <Icon name='dashboard'color={colors.secondary}/>
                 }  
             },
+            Documents: {
+                screen: props => { 
+                    return (<Documents {...props} patient={this.state.patient} user={this.state.user} />)
+                },
+                navigationOptions: {
+                    drawerLabel: 'Documents ',
+                    drawerIcon: <Icon name='file-document' type='material-community' color={colors.secondary}/>
+                }  
+            },
+            Logout: {
+                screen: props => { 
+                    this.logout(); return (<Hidden/>);
+                },
+                navigationOptions: {
+                    drawerLabel: 'Logout ',
+                    drawerIcon: <Icon name='exit-to-app' color={colors.secondary}/>
+                }  
+            },
+
             
         },{
             backBehavior: 'history',
@@ -125,7 +122,6 @@ class MainNavigator extends Component {
                   opacity: 1
                 },
             },
-            contentComponent: DrawerComponent,
         }));
         
         const Drawer = createAppContainer(DrawerNavigator);
